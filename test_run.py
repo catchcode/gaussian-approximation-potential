@@ -1,4 +1,5 @@
-import dataset 
+import dataset
+import soap
 
 
 # Upper case E implies that molecular energy E consists of atomice energies e's
@@ -22,45 +23,6 @@ elif precision == 'double':
 else:
     float_dtype = np.float
     complex_dtype = np.complex
-    
-    
-def run_nickle_dimer():
-    '''Run Nickle dimer test case.'''
-    train_set = dataset('data/ni-dimer.xyz')
-    model = soap(lmax=2, nmax=10, sigma=0.8, rcut=5.2,
-                 zeta=6, sigma_nu_energy=0.003, sigma_nu_force=0.0001)
-    model.rep_atoms = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28]
-    model.fit(train_set)
-    # print('alpha = ', model.alpha)
-    # plot_matrix(np.matrix(model.alpha))
-    test_set = train_set
-    model_energies = model.total_energies(test_set)
-    # TODO: Print a single validation metric
-    rel_error = []
-    for input_e, gap_e in zip(test_set.total_energy_list, model_energies):
-        rel_error.append(eval_rel_error(input_e, gap_e))
-        print(
-            ' {:.2f}'.format(input_e),
-            ' {:.2f}'.format(gap_e),
-            ' {: .2f}'.format(gap_e - input_e)
-            )
-        # print('%0.3f'%input_e, '%0.3f'%gap_e)
-    print("Relative mean absolute error = {:0.4E}".format(np.sum(rel_error)/len(rel_error)))
-
-    if calc_f_from_rep:
-        model_forces = model.total_forces_from_e(test_set)
-        n_atoms = np.array(model_forces).shape[1] # (ndata, n_atoms, 3)[1] = n_atoms
-        #n_atoms = len(model_forces[0])
-        rel_error = []
-        for input_f, gap_f in zip(test_set.total_force_list, model_forces):
-            rel_error.append(eval_rel_error(input_f, gap_f))
-            print(
-                '  {:8.3f} {:8.3f} {:8.3f}'.format(*input_f),
-                '  {:8.3f} {:8.3f} {:8.3f}'.format(*gap_f),
-                '  {:8.3f} {:8.3f} {:8.3f}'.format(*(gap_f - input_f))
-            )
-        print("Relative mean absolute error = {:0.4E}".format(np.sum(rel_error)/len(rel_error)))
-
 
 def run_s22a():
     '''Run s22 test case.'''
